@@ -45,7 +45,7 @@ public class Threading {
 
         @Override
         public String getName() {
-            return "dump_tracked_threads";
+            return "dump_keys_threads";
         }
 
         @Override
