@@ -9,9 +9,8 @@ import com.laytonsmith.core.exceptions.CRE.CREThrowable;
 import com.laytonsmith.core.exceptions.ConfigRuntimeException;
 import com.laytonsmith.core.functions.AbstractFunction;
 import com.laytonsmith.core.natives.interfaces.Mixed;
-import sun.security.provider.certpath.CollectionCertStore;
 
-import java.util.ArrayList;
+import java.util.Map;
 
 import static com.laytonsmith.core.functions.Threading.THREAD_ID_MAP;
 
@@ -64,10 +63,12 @@ public class Threading {
         @Override
         public Mixed exec(final Target t, final Environment env, final Mixed... args) throws ConfigRuntimeException {
             CArray carray = new CArray(t);
-            for (Object name : THREAD_ID_MAP.keySet().toArray()) {
-                String s = (String) name;
-                if (THREAD_ID_MAP.get(s).isAlive()) {
-                    carray.push(new CString(s, t), t);
+            synchronized (THREAD_ID_MAP) {
+                for (Map.Entry<String, Thread> e :
+                        THREAD_ID_MAP.entrySet()) {
+                    if (e.getValue().isAlive()) {
+                        carray.push(new CString(e.getKey(), t), t);
+                    }
                 }
             }
             return carray;
@@ -111,7 +112,10 @@ public class Threading {
         @Override
         public Mixed exec(Target t, Environment env, Mixed... args) throws ConfigRuntimeException {
             String id = args[0].val();
-            Thread thread = THREAD_ID_MAP.get(id);
+            Thread thread;
+            synchronized (THREAD_ID_MAP) {
+                thread = THREAD_ID_MAP.get(id);
+            }
             if (thread != null) {
                 synchronized (thread) {
                     thread.stop();
