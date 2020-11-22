@@ -5,11 +5,12 @@ import com.laytonsmith.PureUtilities.Version;
 import com.laytonsmith.abstraction.Implementation;
 import com.laytonsmith.core.extensions.AbstractExtension;
 import com.laytonsmith.core.extensions.MSExtension;
+import org.cadabra.chcadabra.events.abstraction.bukkit.BukkitListener;
 
 @MSExtension("CHCadabra")
 public class LifeCycle extends AbstractExtension {
     public Version getVersion() {
-        return new SimpleVersion(0, 0, 2);
+        return new SimpleVersion(0, 0, 3);
     }
 
     @Override
@@ -17,6 +18,7 @@ public class LifeCycle extends AbstractExtension {
         if(!Implementation.GetServerType().equals(Implementation.Type.SHELL)) {
             System.out.println("CHCadabra " + getVersion() + " loaded.");
         }
+        BukkitListener.register();
     }
 
     @Override
@@ -24,5 +26,6 @@ public class LifeCycle extends AbstractExtension {
         if(!Implementation.GetServerType().equals(Implementation.Type.SHELL)) {
             System.out.println("CHCadabra " + getVersion() + " unloaded.");
         }
+        BukkitListener.unregister();
     }
 }
