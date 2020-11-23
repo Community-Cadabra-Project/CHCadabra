@@ -7,6 +7,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockFormEvent;
+import org.bukkit.event.player.PlayerBucketEmptyEvent;
+import org.bukkit.event.player.PlayerBucketFillEvent;
 
 public class BukkitListener implements Listener {
 
@@ -21,11 +23,25 @@ public class BukkitListener implements Listener {
 
     public static void unregister() {
         BlockFormEvent.getHandlerList().unregister(listener);
+        PlayerBucketEmptyEvent.getHandlerList().unregister(listener);
+        PlayerBucketFillEvent.getHandlerList().unregister(listener);
     }
 
     @EventHandler(priority= EventPriority.LOWEST)
     public void onBlockForm(BlockFormEvent event) {
         BukkitEvents.BukkitBlockFormEventEvent form = new BukkitEvents.BukkitBlockFormEventEvent(event);
         EventUtils.TriggerListener(Driver.EXTENSION, "block_form", form);
+    }
+
+    @EventHandler(priority= EventPriority.LOWEST)
+    public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
+        BukkitEvents.BukkitPlayerBucketEmptyEvent empty = new BukkitEvents.BukkitPlayerBucketEmptyEvent(event);
+        EventUtils.TriggerListener(Driver.EXTENSION, "player_bucket_empty", empty);
+    }
+
+    @EventHandler(priority= EventPriority.LOWEST)
+    public void onPlayerBucketFill(PlayerBucketFillEvent event) {
+        BukkitEvents.BukkitPlayerBucketFillEvent fill = new BukkitEvents.BukkitPlayerBucketFillEvent(event);
+        EventUtils.TriggerListener(Driver.EXTENSION, "player_bucket_fill", fill);
     }
 }
