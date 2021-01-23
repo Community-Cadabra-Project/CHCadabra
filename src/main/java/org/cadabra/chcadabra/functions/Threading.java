@@ -119,10 +119,10 @@ public class Threading {
             if (thread != null) {
                 synchronized (thread) {
                     thread.stop();
-                    return null;
+                    return CBoolean.TRUE;
                 }
             }
-            return CVoid.VOID;
+            return CBoolean.FALSE;
         }
 
         @Override

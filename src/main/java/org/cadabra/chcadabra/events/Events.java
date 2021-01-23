@@ -2,13 +2,12 @@ package org.cadabra.chcadabra.events;
 
 import com.laytonsmith.PureUtilities.Version;
 import com.laytonsmith.abstraction.MCItemStack;
+import com.laytonsmith.abstraction.MCLivingEntity;
 import com.laytonsmith.annotations.api;
 import com.laytonsmith.core.ArgumentValidation;
 import com.laytonsmith.core.MSVersion;
 import com.laytonsmith.core.ObjectGenerator;
-import com.laytonsmith.core.constructs.CArray;
-import com.laytonsmith.core.constructs.CString;
-import com.laytonsmith.core.constructs.Target;
+import com.laytonsmith.core.constructs.*;
 import com.laytonsmith.core.events.AbstractEvent;
 import com.laytonsmith.core.events.BindableEvent;
 import com.laytonsmith.core.events.Driver;
@@ -17,9 +16,11 @@ import com.laytonsmith.core.exceptions.EventException;
 import com.laytonsmith.core.exceptions.PrefilterNonMatchException;
 import com.laytonsmith.core.natives.interfaces.Mixed;
 import org.cadabra.chcadabra.events.abstraction.MCBlockFadeEvent;
+import org.cadabra.chcadabra.events.abstraction.MCEntityPotionEffectEvent;
 import org.cadabra.chcadabra.events.abstraction.MCPlayerBucketEmptyEvent;
 import org.cadabra.chcadabra.events.abstraction.MCPlayerBucketFillEvent;
 
+import java.util.Iterator;
 import java.util.Map;
 
 public class Events {
@@ -268,4 +269,90 @@ public class Events {
         }
     }
 
+    @api
+    public static class entity_potion extends AbstractEvent {
+
+        @Override
+        public String getName() {
+            return "entity_potion";
+        }
+
+        @Override
+        public String docs() {
+            return "{action: <string match>"
+                    + " | cause: <string match>}"
+                    + "Called when a potion effect is modified on an entity. "
+                    + "If the event is cancelled, no change will be made on the entity. "
+                    + "{action: The action which will be performed on the potion effect type "
+                    + " | cause: The cause why the effect has changed "
+                    + " | newPotion: The new potion effect of the changed type which will be applied "
+                    + " | oldPotion: The old potion effect of the changed type, which will be removed "
+                    + " | id: UUID entity}"
+                    + "{} "
+                    + "{}";
+        }
+
+        @Override
+        public Driver driver() {
+            return Driver.EXTENSION;
+        }
+
+        @Override
+        public BindableEvent convert(CArray manualObject, Target t) {
+            return null;
+        }
+
+        @Override
+        public Version since() {
+            return MSVersion.V3_3_4;
+        }
+
+        @Override
+        public boolean matches(Map<String, Mixed> prefilter, BindableEvent e) throws PrefilterNonMatchException {
+            if (e instanceof MCEntityPotionEffectEvent) {
+                MCEntityPotionEffectEvent event = (MCEntityPotionEffectEvent) e;
+
+                Prefilters.match(prefilter, "action", event.getAction().toString(), Prefilters.PrefilterType.STRING_MATCH);
+                Prefilters.match(prefilter, "cause", event.getCause().toString(), Prefilters.PrefilterType.STRING_MATCH);
+
+                return true;
+            }
+
+            return false;
+        }
+
+        @Override
+        public Map<String, Mixed> evaluate(BindableEvent e) throws EventException {
+            if (!(e instanceof MCEntityPotionEffectEvent)) {
+                throw new EventException("Cannot convert event to MCEntityPotionEffectEvent");
+            } else {
+                MCEntityPotionEffectEvent event = (MCEntityPotionEffectEvent) e;
+                Target t = Target.UNKNOWN;
+                Map<String, Mixed> mapEvent = this.evaluate_helper(e);
+                mapEvent.put("id", new CString(event.getEntity().getUniqueId().toString(), t));
+                mapEvent.put("newPotion", event.getNewEffect().map(ef -> (Mixed) potion(ef, t)).orElse(CNull.NULL));
+                mapEvent.put("oldPotion", event.getOldEffect().map(ef -> (Mixed) potion(ef, t)).orElse(CNull.NULL));
+                mapEvent.put("action", new CString(event.getAction().toString().toLowerCase(), t));
+                mapEvent.put("cause", new CString(event.getCause().toString().toLowerCase(), t));
+                return mapEvent;
+            }
+        }
+
+        private CArray potion(MCLivingEntity.MCEffect effect, Target t) {
+            CArray potion = CArray.GetAssociativeArray(t);
+            potion.set("type", effect.getPotionEffectType().name().toLowerCase(), t);
+            potion.set("id", new CInt((long) effect.getPotionEffectType().getId(), t), t);
+            potion.set("strength", new CInt((long) effect.getStrength(), t), t);
+            potion.set("seconds", new CDouble((double) effect.getTicksRemaining() / 20.0D, t), t);
+            potion.set("ambient", CBoolean.get(effect.isAmbient()), t);
+            potion.set("particles", CBoolean.get(effect.hasParticles()), t);
+
+            return potion;
+        }
+
+        @Override
+        public boolean modifyEvent(String key, Mixed value, BindableEvent e) {
+            return false;
+        }
+    }
 }
