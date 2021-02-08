@@ -20,7 +20,6 @@ import org.cadabra.chcadabra.events.abstraction.MCEntityPotionEffectEvent;
 import org.cadabra.chcadabra.events.abstraction.MCPlayerBucketEmptyEvent;
 import org.cadabra.chcadabra.events.abstraction.MCPlayerBucketFillEvent;
 
-import java.util.Iterator;
 import java.util.Map;
 
 public class Events {
