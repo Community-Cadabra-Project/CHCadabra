@@ -30,12 +30,6 @@ public class BukkitListener implements Listener {
     }
 
     @EventHandler(priority= EventPriority.LOWEST)
-    public void onBlockForm(BlockFormEvent event) {
-        BukkitEvents.BukkitBlockFormEventEvent form = new BukkitEvents.BukkitBlockFormEventEvent(event);
-        EventUtils.TriggerListener(Driver.EXTENSION, "block_form", form);
-    }
-
-    @EventHandler(priority= EventPriority.LOWEST)
     public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
         BukkitEvents.BukkitPlayerBucketEmptyEvent empty = new BukkitEvents.BukkitPlayerBucketEmptyEvent(event);
         EventUtils.TriggerListener(Driver.EXTENSION, "player_bucket_empty", empty);
@@ -45,11 +39,5 @@ public class BukkitListener implements Listener {
     public void onPlayerBucketFill(PlayerBucketFillEvent event) {
         BukkitEvents.BukkitPlayerBucketFillEvent fill = new BukkitEvents.BukkitPlayerBucketFillEvent(event);
         EventUtils.TriggerListener(Driver.EXTENSION, "player_bucket_fill", fill);
-    }
-
-    @EventHandler(priority= EventPriority.LOWEST)
-    public void onEntityPotionEffectEvent(EntityPotionEffectEvent event) {
-        BukkitEvents.BukkitEntityPotionEffectEvent potion = new BukkitEvents.BukkitEntityPotionEffectEvent(event);
-        EventUtils.TriggerListener(Driver.EXTENSION, "entity_potion", potion);
     }
 }
