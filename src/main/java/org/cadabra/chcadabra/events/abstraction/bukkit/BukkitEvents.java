@@ -7,14 +7,17 @@ import com.laytonsmith.abstraction.blocks.MCMaterial;
 import com.laytonsmith.abstraction.bukkit.BukkitMCItemStack;
 import com.laytonsmith.abstraction.bukkit.blocks.BukkitMCBlock;
 import com.laytonsmith.abstraction.bukkit.blocks.BukkitMCMaterial;
+import com.laytonsmith.abstraction.bukkit.entities.BukkitMCPlayer;
 import com.laytonsmith.abstraction.enums.bukkit.BukkitMCBlockFace;
 import com.laytonsmith.annotations.abstraction;
 import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
+import org.bukkit.event.player.PlayerItemBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.cadabra.chcadabra.events.abstraction.MCPlayerBucketEmptyEvent;
 import org.cadabra.chcadabra.events.abstraction.MCPlayerBucketFillEvent;
+import org.cadabra.chcadabra.events.abstraction.MCPlayerItemBreakEvent;
 
 public class BukkitEvents {
 
@@ -100,6 +103,30 @@ public class BukkitEvents {
         @Override
         public void setMCItemStack(MCItemStack itemStack) {
             e.setItemStack((ItemStack) itemStack.getHandle());
+        }
+
+        @Override
+        public Object _GetObject() {
+            return e;
+        }
+    }
+
+    @abstraction(type = Implementation.Type.BUKKIT)
+    public static class BukkitPlayerItemBreakEvent implements MCPlayerItemBreakEvent {
+        PlayerItemBreakEvent e;
+
+        public BukkitPlayerItemBreakEvent(Event e) {
+            this.e = (PlayerItemBreakEvent) e;
+        }
+
+        @Override
+        public MCItemStack getBrokenItem() {
+            return new BukkitMCItemStack(e.getBrokenItem());
+        }
+
+        @Override
+        public MCPlayer getPlayer() {
+            return new BukkitMCPlayer(e.getPlayer());
         }
 
         @Override

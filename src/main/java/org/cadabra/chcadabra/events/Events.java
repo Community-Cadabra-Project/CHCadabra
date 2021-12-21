@@ -17,6 +17,7 @@ import com.laytonsmith.core.exceptions.PrefilterNonMatchException;
 import com.laytonsmith.core.natives.interfaces.Mixed;
 import org.cadabra.chcadabra.events.abstraction.MCPlayerBucketEmptyEvent;
 import org.cadabra.chcadabra.events.abstraction.MCPlayerBucketFillEvent;
+import org.cadabra.chcadabra.events.abstraction.MCPlayerItemBreakEvent;
 
 import java.util.Map;
 
@@ -192,6 +193,73 @@ public class Events {
                 return true;
             }
 
+            return false;
+        }
+    }
+
+    @api
+    public static class item_break extends AbstractEvent {
+
+        @Override
+        public String getName() {
+            return "item_break";
+        }
+
+        @Override
+        public String docs() {
+            return "{player: <string match> | itemname: <string match>} "
+                    + "Fired when a player's item breaks (such as a shovel or flint and steel). "
+                    + "After this event, the item's amount will be set to item amount - 1 and its durability will be reset to 0. "
+                    + "{player: The player | item: An item array of the item being broke}"
+                    + "{} "
+                    + "{}";
+        }
+
+        @Override
+        public Driver driver() {
+            return Driver.EXTENSION;
+        }
+
+        @Override
+        public BindableEvent convert(CArray manualObject, Target t) {
+            return null;
+        }
+
+        @Override
+        public Version since() {
+            return MSVersion.V3_3_1;
+        }
+
+        @Override
+        public boolean matches(Map<String, Mixed> prefilter, BindableEvent e) throws PrefilterNonMatchException {
+            if (e instanceof MCPlayerItemBreakEvent) {
+                MCPlayerItemBreakEvent event = (MCPlayerItemBreakEvent)e;
+
+                Prefilters.match(prefilter, "itemname", event.getBrokenItem().getType().getName(), Prefilters.PrefilterType.STRING_MATCH);
+                Prefilters.match(prefilter, "player", event.getPlayer().getName(), Prefilters.PrefilterType.MACRO);
+
+                return true;
+            }
+
+            return false;
+        }
+
+        @Override
+        public Map<String, Mixed> evaluate(BindableEvent e) throws EventException {
+            if (e instanceof MCPlayerItemBreakEvent) {
+                MCPlayerItemBreakEvent event = (MCPlayerItemBreakEvent) e;
+                Map<String, Mixed> map = evaluate_helper(e);
+
+                map.put("player", new CString(event.getPlayer().getName(), Target.UNKNOWN));
+                map.put("item", ObjectGenerator.GetGenerator().item(event.getBrokenItem(), Target.UNKNOWN));
+
+                return map;
+            }
+            throw new EventException("Cannot convert e to ItemDamageEvent");
+        }
+
+        @Override
+        public boolean modifyEvent(String key, Mixed value, BindableEvent e) {
             return false;
         }
     }
