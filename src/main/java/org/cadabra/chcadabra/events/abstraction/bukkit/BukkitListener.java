@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockFormEvent;
+import org.bukkit.event.entity.EntityBreedEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
@@ -29,6 +30,7 @@ public class BukkitListener implements Listener {
         PlayerBucketFillEvent.getHandlerList().unregister(listener);
         EntityPotionEffectEvent.getHandlerList().unregister(listener);
         PlayerItemBreakEvent.getHandlerList().unregister(listener);
+        EntityBreedEvent.getHandlerList().unregister(listener);
     }
 
     @EventHandler(priority= EventPriority.LOWEST)
@@ -47,5 +49,11 @@ public class BukkitListener implements Listener {
     public void onPlayerBucketFill(PlayerItemBreakEvent event) {
         BukkitEvents.BukkitPlayerItemBreakEvent itemBreak = new BukkitEvents.BukkitPlayerItemBreakEvent(event);
         EventUtils.TriggerListener(Driver.EXTENSION, "item_break", itemBreak);
+    }
+
+    @EventHandler(priority= EventPriority.LOWEST)
+    public void onEntityBreed(EntityBreedEvent event) {
+        BukkitEvents.BukkitEntityBreedEvent entityBreed = new BukkitEvents.BukkitEntityBreedEvent(event);
+        EventUtils.TriggerListener(Driver.EXTENSION, "entity_breed", entityBreed);
     }
 }

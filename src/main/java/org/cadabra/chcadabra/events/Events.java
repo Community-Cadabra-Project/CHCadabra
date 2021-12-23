@@ -2,7 +2,6 @@ package org.cadabra.chcadabra.events;
 
 import com.laytonsmith.PureUtilities.Version;
 import com.laytonsmith.abstraction.MCItemStack;
-import com.laytonsmith.abstraction.MCLivingEntity;
 import com.laytonsmith.annotations.api;
 import com.laytonsmith.core.ArgumentValidation;
 import com.laytonsmith.core.MSVersion;
@@ -12,9 +11,11 @@ import com.laytonsmith.core.events.AbstractEvent;
 import com.laytonsmith.core.events.BindableEvent;
 import com.laytonsmith.core.events.Driver;
 import com.laytonsmith.core.events.Prefilters;
+import com.laytonsmith.core.events.Prefilters.PrefilterType;
 import com.laytonsmith.core.exceptions.EventException;
 import com.laytonsmith.core.exceptions.PrefilterNonMatchException;
 import com.laytonsmith.core.natives.interfaces.Mixed;
+import org.cadabra.chcadabra.events.abstraction.MCEntityBreedEvent;
 import org.cadabra.chcadabra.events.abstraction.MCPlayerBucketEmptyEvent;
 import org.cadabra.chcadabra.events.abstraction.MCPlayerBucketFillEvent;
 import org.cadabra.chcadabra.events.abstraction.MCPlayerItemBreakEvent;
@@ -255,11 +256,95 @@ public class Events {
 
                 return map;
             }
-            throw new EventException("Cannot convert e to ItemDamageEvent");
+            throw new EventException("Cannot convert e to ItemBreakEvent");
         }
 
         @Override
         public boolean modifyEvent(String key, Mixed value, BindableEvent e) {
+            return false;
+        }
+    }
+
+    @api
+    public static class entity_breed extends AbstractEvent {
+
+        @Override
+        public String getName() {
+            return "entity_breed";
+        }
+
+        @Override
+        public String docs() {
+            return "{type: <string match>} "
+                    + "Called when one Entity breeds with another Entity."
+                    + "{child: The child UUID | mother: The mother UUID | father: The father UUID"
+                    + "| breeder: The UUID of breeder responsible for breeding. Breeder is null for spontaneous conception."
+                    + "| item: The ItemStack that was used to initiate breeding, if present."
+                    + "| xp}"
+                    + "{xp: the amount of xp to drop} "
+                    + "{}";
+        }
+
+        @Override
+        public Driver driver() {
+            return Driver.EXTENSION;
+        }
+
+        @Override
+        public BindableEvent convert(CArray manualObject, Target t) {
+            return null;
+        }
+
+        @Override
+        public Version since() {
+            return MSVersion.V3_3_4;
+        }
+
+        @Override
+        public boolean matches(Map<String, Mixed> prefilter, BindableEvent e) throws PrefilterNonMatchException {
+            if(e instanceof MCEntityBreedEvent) {
+                MCEntityBreedEvent event = (MCEntityBreedEvent) e;
+                Prefilters.match(prefilter, "type", event.getFather().getType().name(), PrefilterType.MACRO);
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public Map<String, Mixed> evaluate(BindableEvent e) throws EventException {
+            if (e instanceof MCEntityBreedEvent) {
+                MCEntityBreedEvent event = (MCEntityBreedEvent) e;
+                Map<String, Mixed> map = evaluate_helper(e);
+                final Target t = Target.UNKNOWN;
+
+                map.put("child", new CString(event.getChild().getUniqueId().toString(), t));
+                map.put("mother", new CString(event.getMother().getUniqueId().toString(), t));
+                map.put("father", new CString(event.getFather().getUniqueId().toString(), t));
+                event.getBreeder().ifPresent(breeder ->
+                        map.put("breeder", new CString(breeder.getUniqueId().toString(), t))
+                );
+                event.getBredWith().ifPresent(item ->
+                        map.put("item", ObjectGenerator.GetGenerator().item(item, t))
+                );
+                map.put("xp", new CInt(event.getExperience(), t));
+
+                return map;
+            }
+            throw new EventException("Cannot convert e to EntityBreedEvent");
+        }
+
+        @Override
+        public boolean modifyEvent(String key, Mixed value, BindableEvent e) {
+            MCEntityBreedEvent event = (MCEntityBreedEvent) e;
+
+            if(key.equals("xp")) {
+                int exp = ArgumentValidation.getInt32(value, value.getTarget());
+                if(exp >= 0) {
+                    event.setExperience(exp);
+                    return true;
+                }
+            }
+
             return false;
         }
     }
