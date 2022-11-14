@@ -6,7 +6,7 @@
 
     <groupId>org.cadabra</groupId>
     <artifactId>chcadabra</artifactId>
-    <version>0.0.11</version>
+    <version>0.0.12</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -111,7 +111,7 @@
         <dependency>
             <groupId>com.sk89q</groupId>
             <artifactId>commandhelper</artifactId>
-            <version>3.3.4-SNAPSHOT</version>
+            <version>3.3.5-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.spigotmc</groupId>

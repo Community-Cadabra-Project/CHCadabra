@@ -10,10 +10,8 @@ import com.laytonsmith.core.constructs.*;
 import com.laytonsmith.core.events.AbstractEvent;
 import com.laytonsmith.core.events.BindableEvent;
 import com.laytonsmith.core.events.Driver;
-import com.laytonsmith.core.events.Prefilters;
-import com.laytonsmith.core.events.Prefilters.PrefilterType;
+import com.laytonsmith.core.events.prefilters.*;
 import com.laytonsmith.core.exceptions.EventException;
-import com.laytonsmith.core.exceptions.PrefilterNonMatchException;
 import com.laytonsmith.core.natives.interfaces.Mixed;
 import org.cadabra.chcadabra.events.abstraction.MCEntityBreedEvent;
 import org.cadabra.chcadabra.events.abstraction.MCPlayerBucketEmptyEvent;
@@ -37,9 +35,7 @@ public class Events {
 
         @Override
         public String docs() {
-            return "{dropitem: <string match>"
-                    + " | bucket: <string match>"
-                    + " | facing: <string match>}"
+            return "{} "
                     + "Called when a player empties a bucket."
                     + "{block: The block to be emptied "
                     + " | blockclicked: The block clicked with the bucket"
@@ -64,22 +60,30 @@ public class Events {
 
         @Override
         public Version since() {
-            return MSVersion.V3_3_4;
+            return MSVersion.V3_3_5;
         }
 
         @Override
-        public boolean matches(Map<String, Mixed> prefilter, BindableEvent e) throws PrefilterNonMatchException {
-            if (e instanceof MCPlayerBucketEmptyEvent) {
-                MCPlayerBucketEmptyEvent event = (MCPlayerBucketEmptyEvent) e;
-
-                Prefilters.match(prefilter, "dropitem", event.getItemStack().getType().getName(), Prefilters.PrefilterType.STRING_MATCH);
-                Prefilters.match(prefilter, "bucket", event.getBucket().getName(), Prefilters.PrefilterType.STRING_MATCH);
-                Prefilters.match(prefilter, "facing", event.getBlockFace().toString(), Prefilters.PrefilterType.STRING_MATCH);
-
-                return true;
-            }
-
-            return false;
+        protected PrefilterBuilder getPrefilterBuilder() {
+            return new PrefilterBuilder<MCPlayerBucketEmptyEvent>()
+                    .set("dropitem", "The item that will be dropped after the action.", new ItemStackPrefilterMatcher<MCPlayerBucketEmptyEvent>() {
+                        @Override
+                        protected MCItemStack getItemStack(MCPlayerBucketEmptyEvent event) {
+                            return event.getItemStack();
+                        }
+                    })
+                    .set("bucket", "Bucket name.", new StringPrefilterMatcher<MCPlayerBucketEmptyEvent>() {
+                        @Override
+                        protected String getProperty(MCPlayerBucketEmptyEvent event) {
+                            return event.getBucket().getName();
+                        }
+                    })
+                    .set("facing", "The side of the clicked block.", new StringPrefilterMatcher<MCPlayerBucketEmptyEvent>() {
+                        @Override
+                        protected String getProperty(MCPlayerBucketEmptyEvent event) {
+                            return event.getBlockFace().toString();
+                        }
+                    });
         }
 
         @Override
@@ -117,9 +121,7 @@ public class Events {
 
         @Override
         public String docs() {
-            return "{dropitem: <string match>"
-                    + " | bucket: <string match>"
-                    + " | facing: <string match>}"
+            return "{} "
                     + "Called when a player empties a bucket."
                     + "{block: The block to be emptied "
                     + " | blockclicked: The block clicked with the bucket"
@@ -144,22 +146,30 @@ public class Events {
 
         @Override
         public Version since() {
-            return MSVersion.V3_3_4;
+            return MSVersion.V3_3_5;
         }
 
         @Override
-        public boolean matches(Map<String, Mixed> prefilter, BindableEvent e) throws PrefilterNonMatchException {
-            if (e instanceof MCPlayerBucketFillEvent) {
-                MCPlayerBucketFillEvent event = (MCPlayerBucketFillEvent)e;
-
-                Prefilters.match(prefilter, "dropitem", event.getItemStack().getType().getName(), Prefilters.PrefilterType.STRING_MATCH);
-                Prefilters.match(prefilter, "bucket", event.getBucket().getName(), Prefilters.PrefilterType.STRING_MATCH);
-                Prefilters.match(prefilter, "facing", event.getBlockFace().toString(), Prefilters.PrefilterType.STRING_MATCH);
-
-                return true;
-            }
-
-            return false;
+        protected PrefilterBuilder getPrefilterBuilder() {
+            return new PrefilterBuilder<MCPlayerBucketFillEvent>()
+                    .set("dropitem", "The item that will be dropped after the action.", new ItemStackPrefilterMatcher<MCPlayerBucketFillEvent>() {
+                        @Override
+                        protected MCItemStack getItemStack(MCPlayerBucketFillEvent event) {
+                            return event.getItemStack();
+                        }
+                    })
+                    .set("bucket", "Bucket name.", new StringPrefilterMatcher<MCPlayerBucketFillEvent>() {
+                        @Override
+                        protected String getProperty(MCPlayerBucketFillEvent event) {
+                            return event.getBucket().getName();
+                        }
+                    })
+                    .set("facing", "The side of the clicked block.", new StringPrefilterMatcher<MCPlayerBucketFillEvent>() {
+                        @Override
+                        protected String getProperty(MCPlayerBucketFillEvent event) {
+                            return event.getBlockFace().toString();
+                        }
+                    });
         }
 
         @Override
@@ -208,7 +218,7 @@ public class Events {
 
         @Override
         public String docs() {
-            return "{player: <string match> | itemname: <string match>} "
+            return "{} "
                     + "Fired when a player's item breaks (such as a shovel or flint and steel). "
                     + "After this event, the item's amount will be set to item amount - 1 and its durability will be reset to 0. "
                     + "{player: The player | item: An item array of the item being broke}"
@@ -228,21 +238,19 @@ public class Events {
 
         @Override
         public Version since() {
-            return MSVersion.V3_3_1;
+            return MSVersion.V3_3_5;
         }
 
         @Override
-        public boolean matches(Map<String, Mixed> prefilter, BindableEvent e) throws PrefilterNonMatchException {
-            if (e instanceof MCPlayerItemBreakEvent) {
-                MCPlayerItemBreakEvent event = (MCPlayerItemBreakEvent)e;
-
-                Prefilters.match(prefilter, "itemname", event.getBrokenItem().getType().getName(), Prefilters.PrefilterType.STRING_MATCH);
-                Prefilters.match(prefilter, "player", event.getPlayer().getName(), Prefilters.PrefilterType.MACRO);
-
-                return true;
-            }
-
-            return false;
+        protected PrefilterBuilder getPrefilterBuilder() {
+            return new PrefilterBuilder<MCPlayerItemBreakEvent>()
+                    .set("itemname", "The name of the item being broke.", new StringPrefilterMatcher<MCPlayerItemBreakEvent>() {
+                        @Override
+                        protected String getProperty(MCPlayerItemBreakEvent event) {
+                            return event.getBrokenItem().getType().getName();
+                        }
+                    })
+                    .set("player", "The player holding item.", new PlayerPrefilterMatcher<>());
         }
 
         @Override
@@ -275,7 +283,7 @@ public class Events {
 
         @Override
         public String docs() {
-            return "{type: <string match>} "
+            return "{} "
                     + "Called when one Entity breeds with another Entity."
                     + "{child: The child UUID | mother: The mother UUID | father: The father UUID"
                     + "| breeder: The UUID of breeder responsible for breeding. Breeder is null for spontaneous conception."
@@ -297,17 +305,18 @@ public class Events {
 
         @Override
         public Version since() {
-            return MSVersion.V3_3_4;
+            return MSVersion.V3_3_5;
         }
 
         @Override
-        public boolean matches(Map<String, Mixed> prefilter, BindableEvent e) throws PrefilterNonMatchException {
-            if(e instanceof MCEntityBreedEvent) {
-                MCEntityBreedEvent event = (MCEntityBreedEvent) e;
-                Prefilters.match(prefilter, "type", event.getFather().getType().name(), PrefilterType.MACRO);
-                return true;
-            }
-            return false;
+        protected PrefilterBuilder getPrefilterBuilder() {
+            return new PrefilterBuilder<MCEntityBreedEvent>()
+                    .set("type", "The type of entities", new MacroPrefilterMatcher<MCEntityBreedEvent>() {
+                        @Override
+                        protected Object getProperty(MCEntityBreedEvent event) {
+                            return event.getFather().getType().name();
+                        }
+                    });
         }
 
         @Override
