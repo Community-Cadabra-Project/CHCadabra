@@ -17,18 +17,26 @@ This augments CommandHelper with my events from bukkit
 
 Checks if an entity exists in the world
 
-#### boolean entity_in_love_mode(entityUUID)
+### boolean entity_in_love_mode(entityUUID)
 
 Checks if an entity in love mode
 
-#### void set_love_mode_ticks(entityUUID, ticks)
+### void set_love_mode_ticks(entityUUID, ticks)
 
 Set the amount of ticks for which this entity should be in love mode. Setting the love mode ticks to 600 is the equivalent of a player feeding the entity their breeding item of choice
 
-#### void set_arrow_pickup(entityUUID, pickup)
+### void set_arrow_pickup(entityUUID, pickup)
 
 Sets the current pickup status of this arrow
 
-#### string get_arrow_pickup(entityUUID)
+### string get_arrow_pickup(entityUUID)
 
 Gets the current pickup status of this arrow.
+
+## Environment
+
+### array get_end_gateway_data(location)
+
+Return EndGateway block data
+
+

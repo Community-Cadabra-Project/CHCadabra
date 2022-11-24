@@ -17,8 +17,6 @@ import com.laytonsmith.core.functions.AbstractFunction;
 import com.laytonsmith.core.natives.interfaces.Mixed;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Animals;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.SpectralArrow;
 import org.cadabra.chcadabra.abstraction.enums.MCArrowPickupStatus;
 import org.cadabra.chcadabra.abstraction.enums.bukkit.BukkitMCArrowPickupStatus;
 
