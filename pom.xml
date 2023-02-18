@@ -6,7 +6,7 @@
 
     <groupId>org.cadabra</groupId>
     <artifactId>chcadabra</artifactId>
-    <version>0.0.13</version>
+    <version>0.0.14</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -74,16 +74,6 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.2.1</version>
 
-                <executions>
-                    <execution>
-                        <id>cache-annotations</id>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                    </execution>
-                </executions>
-
                 <configuration>
                     <mainClass>com.laytonsmith.PureUtilities.ClassLoading.Annotations.CacheAnnotations</mainClass>
 
@@ -105,9 +95,20 @@
             <id>spigot-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
+        <repository>
+            <id>codemc-repo</id>
+            <url>https://repo.codemc.io/repository/maven-public/</url>
+            <layout>default</layout>
+        </repository>
     </repositories>
 
     <dependencies>
+        <dependency>
+            <groupId>de.tr7zw</groupId>
+            <artifactId>item-nbt-api-plugin</artifactId>
+            <version>2.11.1</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>com.sk89q</groupId>
             <artifactId>commandhelper</artifactId>

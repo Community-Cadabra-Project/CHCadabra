@@ -33,10 +33,20 @@ Sets the current pickup status of this arrow
 
 Gets the current pickup status of this arrow.
 
-## Environment
+## World
 
 ### array get_end_gateway_data(location)
 
 Return EndGateway block data
+
+## Inventory
+
+### array pivn_extend([player [slot]])
+
+Same as pinv, but provide custom data
+
+### void set_pivn_extend([player, [slot]], inv)
+
+Same as set_pinv, but provide custom data
 
 

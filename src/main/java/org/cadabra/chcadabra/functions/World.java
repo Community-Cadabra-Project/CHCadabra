@@ -17,7 +17,7 @@ import com.laytonsmith.core.functions.AbstractFunction;
 import com.laytonsmith.core.natives.interfaces.Mixed;
 import org.bukkit.block.EndGateway;
 
-public class Environment {
+public class World {
     public static String docs() {
         return "Allows you to manipulate the environment around the player";
     }

@@ -10,7 +10,7 @@ import org.cadabra.chcadabra.events.abstraction.bukkit.BukkitListener;
 @MSExtension("CHCadabra")
 public class LifeCycle extends AbstractExtension {
     public Version getVersion() {
-        return new SimpleVersion(0, 0, 13);
+        return new SimpleVersion(0, 0, 14);
     }
 
     @Override
