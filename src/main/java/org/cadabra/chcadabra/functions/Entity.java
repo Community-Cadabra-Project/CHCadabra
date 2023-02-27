@@ -1,5 +1,10 @@
 package org.cadabra.chcadabra.functions;
 
+import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.Animals;
+import org.cadabra.chcadabra.abstraction.enums.MCArrowPickupStatus;
+import org.cadabra.chcadabra.abstraction.enums.bukkit.BukkitMCArrowPickupStatus;
+
 import com.laytonsmith.abstraction.MCEntity;
 import com.laytonsmith.abstraction.MCWorld;
 import com.laytonsmith.annotations.api;
@@ -11,14 +16,14 @@ import com.laytonsmith.core.constructs.CString;
 import com.laytonsmith.core.constructs.CVoid;
 import com.laytonsmith.core.constructs.Target;
 import com.laytonsmith.core.environments.Environment;
-import com.laytonsmith.core.exceptions.CRE.*;
 import com.laytonsmith.core.exceptions.ConfigRuntimeException;
+import com.laytonsmith.core.exceptions.CRE.CREBadEntityException;
+import com.laytonsmith.core.exceptions.CRE.CRECastException;
+import com.laytonsmith.core.exceptions.CRE.CREFormatException;
+import com.laytonsmith.core.exceptions.CRE.CREInvalidWorldException;
+import com.laytonsmith.core.exceptions.CRE.CREThrowable;
 import com.laytonsmith.core.functions.AbstractFunction;
 import com.laytonsmith.core.natives.interfaces.Mixed;
-import org.bukkit.entity.AbstractArrow;
-import org.bukkit.entity.Animals;
-import org.cadabra.chcadabra.abstraction.enums.MCArrowPickupStatus;
-import org.cadabra.chcadabra.abstraction.enums.bukkit.BukkitMCArrowPickupStatus;
 
 public class Entity {
     public static String docs() {

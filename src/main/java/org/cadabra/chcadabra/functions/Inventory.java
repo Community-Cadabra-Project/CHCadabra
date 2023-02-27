@@ -1,5 +1,7 @@
 package org.cadabra.chcadabra.functions;
 
+import java.util.Objects;
+
 import org.bukkit.inventory.ItemStack;
 
 import com.laytonsmith.abstraction.MCItemStack;
@@ -269,9 +271,9 @@ public class Inventory {
 
     public static Mixed itemToMixed(MCItemStack is, Target t) {
         Construct result = ObjectGenerator.GetGenerator().item(is, t);
-        if(result.isInstanceOf(CArray.TYPE)) {
+        if (result.isInstanceOf(CArray.TYPE)) {
             ItemStack item = (ItemStack) is.getHandle();
-            ((CArray) result).set("tag", customDataToTag(new NBTItem(item), t), t);
+            ((CArray) result).set("tag", customDataToTag(new NBTItem(item), (CArray) result, t), t);
 
             return result;
         }
@@ -279,9 +281,16 @@ public class Inventory {
         return result;
     }
 
-    private static CArray customDataToTag(NBTCompound comp, Target t) {
+    private static Mixed customDataToTag(NBTCompound comp, CArray r, Target t) {
         CArray arr = new CArray(t);
+        arr.inAssociativeMode();
         for (String key : comp.getKeys()) {
+            if(Objects.nonNull(r)
+                && r.containsKey("meta")
+                && r.get("meta", t).isInstanceOf(CArray.TYPE)
+                && ((CArray) r.get("meta", t)).containsKey(key)) {
+                continue;
+            }
             NBTType type = comp.getType(key);
             Mixed val;
             switch (type) {
@@ -324,6 +333,10 @@ public class Inventory {
                     break;
                 case NBTTagList:
                     NBTType listType = comp.getListType(key);
+                    if(listType.equals(NBTType.NBTTagEnd)) {
+                        val = new CArray(t);
+                        break;
+                    }
                     if (!listType.equals(NBTType.NBTTagString)) {
                         throw new CRECastException(
                                 String.format("Can not cast nbt list with type %s by key %s", listType, key), t);
@@ -337,12 +350,16 @@ public class Inventory {
                     val = sArr;
                     break;
                 case NBTTagCompound:
-                    val = customDataToTag(comp.getCompound(key), t);
+                    val = customDataToTag(comp.getCompound(key), null, t);
                     break;
                 default:
                     throw new CREFormatException(String.format("Unknown nbt tag type %s", type), t);
             }
             arr.set(key, val, t);
+        }
+
+        if (arr.isEmpty()) {
+            return CNull.NULL;
         }
 
         return arr;
@@ -354,15 +371,17 @@ public class Inventory {
             return result;
         }
         CArray arr = (CArray) arg;
-        if(arr.containsKey("tag")) {
-            Mixed v = arr.get("tag", t);
+        Mixed v;
+        if (arr.containsKey("tag") && (v = arr.get("tag", t)) != CNull.NULL) {
             CArray tag;
-            if(!v.isInstanceOf(CArray.TYPE) || !(tag = (CArray)v).isAssociative()) {
+            if (!v.isInstanceOf(CArray.TYPE) || !(tag = (CArray) v).isAssociative()) {
                 throw new CREFormatException("Tag key must contains associative array", t);
             }
             ItemStack is = (ItemStack) result.getHandle();
             NBTItem nbtItem = new NBTItem(is);
             tagToCustomData(tag, nbtItem, t);
+            MCItemStack newItem = new BukkitMCItemStack(nbtItem.getItem());
+            return newItem;
         }
 
         return result;
@@ -388,10 +407,10 @@ public class Inventory {
                 } else {
                     if (!innerArr.isEmpty()) {
                         Mixed first = innerArr.get(0, t);
-                        if (first instanceof CString) {
+                        if (first instanceof CInt) {
                             int[] iArr = new int[(int) innerArr.size()];
-                            for (int i = 0; i < arr.size(); i++) {
-                                Mixed v = arr.get(i, t);
+                            for (int i = 0; i < innerArr.size(); i++) {
+                                Mixed v = innerArr.get(i, t);
                                 if (!(v instanceof CInt)) {
                                     throw new CREFormatException(String.format(
                                             "Not associative array must incude only integers or strings, not %s",
@@ -401,16 +420,9 @@ public class Inventory {
                             }
                             comp.setIntArray(key, iArr);
 
-                        }
-                        if (first instanceof CInt) {
-                            NBTList<String> list = comp.getStringList(key);
-                            innerArr.forEach(v -> list.add(v.toString()));
-
                         } else {
-                            throw new CREFormatException(
-                                    String.format("Not associative array must incude only integers or strings, not %s",
-                                            first.typeof().getSimpleName()),
-                                    t);
+                            NBTList<String> list = comp.getStringList(key);
+                            innerArr.asList().stream().map(Mixed::toString).forEach(list::add);
                         }
                     }
                 }
